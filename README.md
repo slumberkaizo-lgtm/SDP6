@@ -94,131 +94,17 @@ The demo intentionally fails release checks. Its debt estimate is 120 minutes fo
 
 The diagram shows the main pattern relationships and selected members.
 
-```mermaid
-classDiagram
-    class ProjectElement {
-        <<interface>>
-        +accept(ProjectVisitor visitor) void
-    }
-    class ProjectVisitor {
-        <<interface>>
-        +visit(SourceCodeFile file) void
-        +visit(TestFile file) void
-        +visit(ConfigurationFile file) void
-        +visit(DependencyFile file) void
-        +visit(Directory directory) void
-    }
-    class SourceCodeFile {
-        -String name
-        -int lines
-        -int complexity
-        -boolean credentials
-        -boolean tested
-        +accept(ProjectVisitor visitor) void
-    }
-    class TestFile {
-        -String name
-        -int lines
-        -int testCount
-        +accept(ProjectVisitor visitor) void
-    }
-    class ConfigurationFile {
-        -String name
-        -boolean credentials
-        -boolean insecure
-        +accept(ProjectVisitor visitor) void
-    }
-    class DependencyFile {
-        -String name
-        +getDependencies() List~Dependency~
-        +accept(ProjectVisitor visitor) void
-    }
-    class Directory {
-        -String name
-        +add(ProjectElement element) void
-        +accept(ProjectVisitor visitor) void
-    }
-    class Dependency {
-        -String name
-        -String version
-        -boolean vulnerable
-        -boolean prohibited
-    }
-    class SecurityAuditVisitor {
-        +getCriticalIssues() int
-        +getReport() String
-    }
-    class ProjectStatisticsVisitor {
-        +getAverageComplexity() double
-        +getTestSourceRatio() double
-        +getReport() String
-    }
-    class QualityGateVisitor {
-        +isPassed() boolean
-        +getReport() String
-    }
-    class ComplianceVisitor {
-        +isCompliant() boolean
-        +getReport() String
-    }
-    class TechnicalDebtVisitor {
-        +getMinutes() int
-        +getReport() String
-    }
-    class Main
-    class DemoProject {
-        +create() Directory
-    }
-    ProjectElement <|.. SourceCodeFile
-    ProjectElement <|.. TestFile
-    ProjectElement <|.. ConfigurationFile
-    ProjectElement <|.. DependencyFile
-    ProjectElement <|.. Directory
-    Directory *-- "0..*" ProjectElement : children
-    DependencyFile *-- "0..*" Dependency : dependencies
-    ProjectVisitor <|.. SecurityAuditVisitor
-    ProjectVisitor <|.. ProjectStatisticsVisitor
-    ProjectVisitor <|.. QualityGateVisitor
-    ProjectVisitor <|.. ComplianceVisitor
-    ProjectVisitor <|.. TechnicalDebtVisitor
-    ProjectElement ..> ProjectVisitor : accept calls visit
-    ProjectVisitor ..> SourceCodeFile
-    ProjectVisitor ..> TestFile
-    ProjectVisitor ..> ConfigurationFile
-    ProjectVisitor ..> DependencyFile
-    ProjectVisitor ..> Directory
-    QualityGateVisitor *-- SecurityAuditVisitor
-    QualityGateVisitor *-- ProjectStatisticsVisitor
-    Main ..> DemoProject
-    Main ..> ProjectVisitor : runs inspections
-```
+![Visitor pattern class diagram](docs/class-diagram.png)
+
+[Mermaid source](docs/class-diagram.mmd)
 
 ## Sequence diagram
 
 This is the source-file part of a security traversal through the demo tree.
 
-```mermaid
-sequenceDiagram
-    participant Main
-    participant Root as root Directory
-    participant Src as src Directory
-    participant File as PaymentService SourceCodeFile
-    participant Audit as SecurityAuditVisitor
-    Main->>Root: accept(audit)
-    Root->>Audit: visit(this Directory)
-    Root->>Src: accept(audit)
-    Src->>Audit: visit(this Directory)
-    Src->>File: accept(audit)
-    File->>Audit: visit(this SourceCodeFile)
-    Audit->>File: getCredentials()
-    File-->>Audit: true
-    Note over Audit: Add critical issue
-    Audit->>File: getComplexity()
-    File-->>Audit: 14
-    Note over Root: Continue with remaining children
-    Main->>Audit: getReport()
-    Audit-->>Main: Security report
-```
+![Security audit sequence diagram](docs/sequence-diagram.png)
+
+[Mermaid source](docs/sequence-diagram.mmd)
 
 ## Visitor questions
 

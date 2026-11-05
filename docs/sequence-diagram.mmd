@@ -1,0 +1,20 @@
+sequenceDiagram
+    participant Main
+    participant Root as root Directory
+    participant Src as src Directory
+    participant File as PaymentService SourceCodeFile
+    participant Audit as SecurityAuditVisitor
+    Main->>Root: accept(audit)
+    Root->>Audit: visit(this Directory)
+    Root->>Src: accept(audit)
+    Src->>Audit: visit(this Directory)
+    Src->>File: accept(audit)
+    File->>Audit: visit(this SourceCodeFile)
+    Audit->>File: getCredentials()
+    File-->>Audit: true
+    Note over Audit: Add critical issue
+    Audit->>File: getComplexity()
+    File-->>Audit: 14
+    Note over Root: Continue with remaining children
+    Main->>Audit: getReport()
+    Audit-->>Main: Security report
