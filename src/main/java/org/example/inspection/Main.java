@@ -20,5 +20,9 @@ public class Main {
         ComplianceVisitor compliance = new ComplianceVisitor();
         project.accept(compliance);
         System.out.println("\n" + compliance.getReport());
+
+        TechnicalDebtVisitor debt = new TechnicalDebtVisitor();
+        project.accept(debt);
+        System.out.println("\n" + debt.getReport());
     }
 }
